@@ -36,6 +36,11 @@ public interface ItemUIRegistry extends ItemRegistry, ItemUIProvider {
      * "[%s]" for a string or "[%.3f]" for a decimal, this is replaced by the
      * current value of the item and padded by a "<span>" element.
      *
+     * If the widget is a linkable widget and 'valueAsLabel' is set, only the [%format] section will be shown in
+     * place of the Label text (ie - on the left).
+     *
+     * If the widget is a Group widget and LabelItem is set, the LabelItem will be used to create the label.
+     *
      * @param w
      *            the widget to retrieve the label for
      * @return the label to use for the widget

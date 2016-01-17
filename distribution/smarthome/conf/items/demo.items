@@ -5,8 +5,8 @@ Dimmer DemoDimmer					(DemoSwitchGroup)
 Rollershutter DemoRollershutter
 Color DemoColor						(DemoSwitchGroup)
 DateTime DemoDateTime
-Location DemoLocation
-String DemoString
+Location DemoLocation "Date [%1$tA, %1$td.%1$tm.%1$tY]"
+String DemoString  "Message [t %s]"
 Contact DemoContact
 
 Number Weather_Temperature 		"Outside Temperature [%.1f °C]"	<temperature> (Weather_Chart) { channel="yahooweather:weather:berlin:temperature" }
