@@ -26,18 +26,22 @@ LinkableWidget:
 Frame:
 	{Frame} 'Frame' (('item=' item=ItemRef)? & ('label=' label=(ID | STRING))? & ('icon=' icon=Icon)? &
 		('labelcolor=[' (LabelColor+=ColorArray (',' LabelColor+=ColorArray)* ']'))? &
+		(valueAsLabel?='valueAsLabel')? &
 		('valuecolor=[' (ValueColor+=ColorArray (',' ValueColor+=ColorArray)* ']'))? &
 		('visibility=[' (Visibility+=VisibilityRule (',' Visibility+=VisibilityRule)* ']'))?);
 
 Text:
 	{Text} 'Text' (('item=' item=ItemRef)? & ('label=' label=(ID | STRING))? & ('icon=' icon=Icon)? &
 		('labelcolor=[' (LabelColor+=ColorArray (',' LabelColor+=ColorArray)* ']'))? &
+	    (valueAsLabel?='valueAsLabel')? &
 		('valuecolor=[' (ValueColor+=ColorArray (',' ValueColor+=ColorArray)* ']'))? &
 		('visibility=[' (Visibility+=VisibilityRule (',' Visibility+=VisibilityRule)* ']'))?);
 
 Group:
 	'Group' (('item=' item=GroupItemRef) & ('label=' label=(ID | STRING))? & ('icon=' icon=Icon)? &
 		('labelcolor=[' (LabelColor+=ColorArray (',' LabelColor+=ColorArray)* ']'))? &
+		(valueAsLabel?='valueAsLabel')? &
+		('labelItem=' labelItem=ItemRef)? &
 		('valuecolor=[' (ValueColor+=ColorArray (',' ValueColor+=ColorArray)* ']'))? &
 		('visibility=[' (Visibility+=VisibilityRule (',' Visibility+=VisibilityRule)* ']'))?);
 
@@ -45,6 +49,7 @@ Image:
 	'Image' (('item=' item=ItemRef)? & ('label=' label=(ID | STRING))? & ('icon=' icon=Icon)? &
 		('url=' url=STRING) &  ('refresh=' refresh=INT)? &
 		('labelcolor=[' (LabelColor+=ColorArray (',' LabelColor+=ColorArray)* ']'))? &
+		(valueAsLabel?='valueAsLabel')? &
 		('valuecolor=[' (ValueColor+=ColorArray (',' ValueColor+=ColorArray)* ']'))? &		('iconcolor=[' (IconColor+=ColorArray (',' IconColor+=ColorArray)* ']'))? &
 		('visibility=[' (Visibility+=VisibilityRule (',' Visibility+=VisibilityRule)* ']'))?);
 

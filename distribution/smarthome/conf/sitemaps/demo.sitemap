@@ -1,9 +1,14 @@
 sitemap demo label="Demo Sitemap" {
 	Frame label="Demo Items" {
 		Text item=DemoContact label="Contact [MAP(en.map):%s]"
-		Text item=DemoString label="Message [%s]"
+		Text item=DemoString label="Message [%s]" valueAsLabel
 		Text item=DemoDateTime label="Date [%1$tA, %1$td.%1$tm.%1$tY]"
-		Group item=DemoSwitchGroup icon="switch"
+		Group item=DemoSwitchGroup valueAsLabel icon="switch"
+		Text item=DemoString label="Message [%s]" valueAsLabel icon="switch" { 
+		      Switch item=DemoSwitch
+		      Slider item=DemoDimmer
+		      Colorpicker  item=DemoColor
+		}
 	}
 	Frame label="Location" {
 		Mapview item=DemoLocation height=10
