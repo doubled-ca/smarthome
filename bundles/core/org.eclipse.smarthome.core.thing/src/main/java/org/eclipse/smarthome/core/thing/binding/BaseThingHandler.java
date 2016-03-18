@@ -24,6 +24,7 @@ import org.eclipse.smarthome.core.thing.ThingRegistry;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.ThingStatusInfo;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder;
 import org.eclipse.smarthome.core.thing.binding.builder.ThingStatusInfoBuilder;
@@ -189,7 +190,7 @@ public abstract class BaseThingHandler implements ThingHandler {
     protected void validateConfigurationParameters(Map<String, Object> configurationParameters)
             throws ConfigValidationException {
         ThingType thingType = TypeResolver.resolve(getThing().getThingTypeUID());
-        if (thingType != null) {
+        if (thingType != null && thingType.getConfigDescriptionURI() != null) {
             ConfigDescriptionValidator.validate(configurationParameters, thingType.getConfigDescriptionURI());
         }
     }
@@ -249,7 +250,7 @@ public abstract class BaseThingHandler implements ThingHandler {
      *             if handler is not initialized correctly, because no callback is present
      */
     protected void updateState(String channelID, State state) {
-        ChannelUID channelUID = new ChannelUID(this.getThing().getUID(), channelID);
+        ChannelUID channelUID = new ChannelUID(this.getThing().getThingTypeUID(), this.getThing().getUID(), channelID);
         updateState(channelUID, state);
     }
 
@@ -264,7 +265,7 @@ public abstract class BaseThingHandler implements ThingHandler {
      *             if handler is not initialized correctly, because no callback is present
      */
     protected void postCommand(String channelID, Command command) {
-        ChannelUID channelUID = new ChannelUID(this.getThing().getUID(), channelID);
+        ChannelUID channelUID = new ChannelUID(this.getThing().getThingTypeUID(), this.getThing().getUID(), channelID);
         postCommand(channelUID, command);
     }
 
@@ -342,8 +343,9 @@ public abstract class BaseThingHandler implements ThingHandler {
      * @return {@link ThingBuilder} which builds an exact copy of the thing (not null)
      */
     protected ThingBuilder editThing() {
-        return ThingBuilder.create(this.thing.getUID()).withBridge(this.thing.getBridgeUID())
-                .withChannels(this.thing.getChannels()).withConfiguration(this.thing.getConfiguration());
+        return ThingBuilder.create(this.thing.getThingTypeUID(), this.thing.getUID())
+                .withBridge(this.thing.getBridgeUID()).withChannels(this.thing.getChannels())
+                .withConfiguration(this.thing.getConfiguration());
     }
 
     /**
@@ -515,13 +517,13 @@ public abstract class BaseThingHandler implements ThingHandler {
 
     /**
      * Returns whether the thing has already been initialized.
-     * 
+     *
      * @return true if thing is initialized, false otherwise
      */
     protected boolean thingIsInitialized() {
         return getThing().getStatus() == ThingStatus.ONLINE || getThing().getStatus() == ThingStatus.OFFLINE;
     }
-    
+
     @Override
     public void bridgeHandlerInitialized(ThingHandler thingHandler, Bridge bridge) {
         // do nothing by default, can be overridden by subclasses
@@ -530,6 +532,19 @@ public abstract class BaseThingHandler implements ThingHandler {
     @Override
     public void bridgeHandlerDisposed(ThingHandler thingHandler, Bridge bridge) {
         // do nothing by default, can be overridden by subclasses
+    }
+
+    @Override
+    public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
+        // do nothing by default, can be overridden by subclasses
+    }
+
+    protected void changeThingType(ThingTypeUID thingTypeUID, Configuration configuration) {
+        if (this.callback != null) {
+            this.callback.changeThingType(getThing(), thingTypeUID, configuration);
+        } else {
+            throw new IllegalStateException("Could not change thing type because callback is missing");
+        }
     }
 
 }

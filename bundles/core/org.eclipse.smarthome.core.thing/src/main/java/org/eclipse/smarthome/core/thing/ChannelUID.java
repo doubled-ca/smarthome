@@ -7,9 +7,7 @@
  */
 package org.eclipse.smarthome.core.thing;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * {@link ChannelUID} represents a unique identifier for channels.
@@ -17,6 +15,7 @@ import java.util.List;
  * @author Oliver Libutzki - Initital contribution
  * @author Jochen Hiller - Bugfix 455434: added default constructor
  * @author Dennis Nobel - Added channel group id
+ * @author Kai Kreuzer - Changed creation of channels to not require a thing type
  */
 public class ChannelUID extends UID {
 
@@ -40,9 +39,13 @@ public class ChannelUID extends UID {
      * @param id
      *            the channel's id
      */
+    @Deprecated
     public ChannelUID(ThingUID thingUID, String id) {
-        super(getArray(thingUID.getBindingId(), thingUID.getThingTypeId(), thingUID.getId(), null, id,
-                thingUID.getBridgeIds()));
+        super(getArray(thingUID, null, id));
+    }
+
+    public ChannelUID(ThingTypeUID thingTypeUID, ThingUID thingUID, String id) {
+        super(getArray(thingUID, null, id));
     }
 
     /**
@@ -53,8 +56,12 @@ public class ChannelUID extends UID {
      *            the channel's id
      */
     public ChannelUID(ThingUID thingUID, String groupId, String id) {
-        super(getArray(thingUID.getBindingId(), thingUID.getThingTypeId(), thingUID.getId(), groupId, id,
-                thingUID.getBridgeIds()));
+        super(getArray(thingUID, groupId, id));
+    }
+
+    @Deprecated
+    public ChannelUID(ThingTypeUID thingTypeUID, ThingUID thingUID, String groupId, String id) {
+        super(getArray(thingUID, groupId, id));
     }
 
     /**
@@ -87,21 +94,12 @@ public class ChannelUID extends UID {
         super(bindingId, thingTypeId, thingId, getChannelId(groupId, id));
     }
 
-    private static String[] getArray(String bindingId, String thingTypeId, String thingId, String groupId, String id,
-            List<String> bridgeIds) {
+    private static String[] getArray(ThingUID thingUID, String groupId, String id) {
 
-        if (bridgeIds == null) {
-            return new String[] { bindingId, thingTypeId, thingId, getChannelId(groupId, id) };
+        String[] result = new String[thingUID.getSegments().length + 1];
+        for (int i = 0; i < thingUID.getSegments().length; i++) {
+            result[i] = thingUID.getSegments()[i];
         }
-
-        String[] result = new String[4 + bridgeIds.size()];
-        result[0] = bindingId;
-        result[1] = thingTypeId;
-        for (int i = 0; i < bridgeIds.size(); i++) {
-            result[i + 2] = bridgeIds.get(i);
-        }
-
-        result[result.length - 2] = thingId;
         result[result.length - 1] = getChannelId(groupId, id);
 
         return result;
@@ -109,38 +107,6 @@ public class ChannelUID extends UID {
 
     private static String getChannelId(String groupId, String id) {
         return groupId != null ? groupId + CHANNEL_GROUP_SEPERATOR + id : id;
-    }
-
-    /**
-     * Returns the thing type id.
-     *
-     * @return thing type id
-     */
-    public String getThingTypeId() {
-        return getSegment(1);
-    }
-
-    /**
-     * Returns the thing id.
-     *
-     * @return thing id
-     */
-    public String getThingId() {
-        return getSegment(2);
-    }
-
-    /**
-     * Returns the bridge ids.
-     *
-     * @return list of bridge ids
-     */
-    public List<String> getBridgeIds() {
-        List<String> bridgeIds = new ArrayList<>();
-        String[] segments = getSegments();
-        for (int i = 3; i < segments.length - 1; i++) {
-            bridgeIds.add(segments[i]);
-        }
-        return bridgeIds;
     }
 
     /**
@@ -155,7 +121,7 @@ public class ChannelUID extends UID {
 
     /**
      * Returns the id without the group id.
-     * 
+     *
      * @return id id without group id
      */
     public String getIdWithoutGroup() {
@@ -193,10 +159,8 @@ public class ChannelUID extends UID {
             super.validateSegment(segment, index, length);
         } else {
             if (!segment.matches("[A-Za-z0-9_#-]*")) {
-                throw new IllegalArgumentException(
-                        "UID segment '"
-                                + segment
-                                + "' contains invalid characters. The last segment of the channel UID must match the pattern [A-Za-z0-9_-#]*.");
+                throw new IllegalArgumentException("UID segment '" + segment
+                        + "' contains invalid characters. The last segment of the channel UID must match the pattern [A-Za-z0-9_-#]*.");
             }
         }
     }
@@ -210,13 +174,4 @@ public class ChannelUID extends UID {
         return new ThingUID(Arrays.copyOfRange(getSegments(), 0, getSegments().length - 1));
     }
 
-    /**
-     * Returns the thing type UID
-     *
-     * @return the thing type UID
-     */
-    public ThingTypeUID getThingTypeUID() {
-        String[] segments = getSegments();
-        return new ThingTypeUID(segments[0], segments[1]);
-    }
 }
